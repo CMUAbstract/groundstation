@@ -229,7 +229,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>SpriteRecording.dat</value>
+      <value>/tmp/sprite-stream-pipe</value>
     </param>
     <param>
       <key>_coordinate</key>

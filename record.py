@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Top Block
-# Generated: Thu May 18 17:55:35 2017
+# Generated: Thu May 18 18:24:53 2017
 ##################################################
 
 from gnuradio import blocks
@@ -50,7 +50,7 @@ class top_block(gr.top_block):
                 taps=None,
                 fractional_bw=None,
         )
-        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_gr_complex*1, 'SpriteRecording.dat', False)
+        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_gr_complex*1, '/tmp/sprite-stream-pipe', False)
         self.blocks_file_sink_0.set_unbuffered(False)
 
         ##################################################
