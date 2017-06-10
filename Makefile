@@ -1,4 +1,4 @@
-DESTDIR ?= /usr
+DESTDIR ?= /
 
 SCRIPTS = \
 	SpriteReceiver2.py \
@@ -15,7 +15,7 @@ all : $(SCRIPTS)
 # and install it using setuptools
  
 install : $(SCRIPTS)
-	for s in $(SCRIPTS); do install -Dm755 $$s $(DESTDIR)/bin/$$s; done
+	for s in $(SCRIPTS); do install -Dm755 $$s $(DESTDIR)/usr/bin/$$s; done
 
 clean :
 	rm -f $(SCRIPTS)
