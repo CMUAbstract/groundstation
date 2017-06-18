@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+
+DATA_DIR=$1
+
+CMD="SpriteRecorder_RTL.py -o $DATA_DIR/rec.$(next-file-index $DATA_DIR)"
+echo $CMD
+$CMD
