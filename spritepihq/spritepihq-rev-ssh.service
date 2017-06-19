@@ -1,0 +1,11 @@
+[Unit]
+Description=Reverse SSH tunnel to SpritePi HQ
+
+[Service]
+User=sprite
+Group=sprite
+ExecStart=/usr/local/bin/spritepihq-rev-ssh
+Restart=on-abort
+
+[Install]
+WantedBy=default.target
