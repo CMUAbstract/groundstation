@@ -45,5 +45,5 @@ do
 			LAST_PORT=
 		fi
 	fi
-	sleep 10
+	sleep 600
 done
