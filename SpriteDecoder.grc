@@ -312,11 +312,11 @@
     </param>
     <param>
       <key>id</key>
-      <value>parameter_0</value>
+      <value>infile</value>
     </param>
     <param>
       <key>label</key>
-      <value>infile</value>
+      <value></value>
     </param>
     <param>
       <key>short_id</key>
