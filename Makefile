@@ -4,6 +4,7 @@ SCRIPTS = \
 	SpriteReceiver2.py \
 	SpriteRecorder_RTL.py \
 	SpriteDecoder.py \
+	OHBSpriteReceiver.py \
 	WavToRaw.py \
 
 all : $(SCRIPTS)
