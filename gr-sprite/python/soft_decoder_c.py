@@ -314,7 +314,8 @@ class soft_decoder_c(gr.sync_block):
                 cor3 = dot(self._C,codeword)/sqrt(dot(codeword,codeword))
                 if max(cor3) > self._detection_threshold:
                     k += 22
-                    print(chr(argmax(cor3)), end='')
+                    d = argmax(cor3)
+                    print("[%02x](%c)" % (d, chr(d)), end='')
                     sys.stdout.flush()
                 else:
                     k += 1
@@ -325,7 +326,8 @@ class soft_decoder_c(gr.sync_block):
                 cor3 = dot(self._C,codeword)/sqrt(dot(codeword,codeword))
                 if max(cor3) > self._detection_threshold:
                     k += 22
-                    print(chr(argmax(cor3)), end='')
+                    d = argmax(cor3)
+                    print("[%02x](%c)" % (d, chr(d)), end='')
                     sys.stdout.flush()
                 else:
                     k += 1
