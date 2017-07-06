@@ -24,6 +24,7 @@ from math import *
 from numpy import *
 from gnuradio import gr
 import sys
+import os
 
 class soft_decoder_c(gr.sync_block):
     """
@@ -315,7 +316,7 @@ class soft_decoder_c(gr.sync_block):
                 if max(cor3) > self._detection_threshold:
                     k += 22
                     d = argmax(cor3)
-                    sys.stdout.write([d])
+                    os.write(sys.stdout.fileno(), bytearray(d))
                     #print("[%02x](%c)" % (d, chr(d)), end='')
                     sys.stdout.flush()
                 else:
@@ -328,7 +329,7 @@ class soft_decoder_c(gr.sync_block):
                 if max(cor3) > self._detection_threshold:
                     k += 22
                     d = argmax(cor3)
-                    sys.stdout.write([d])
+                    os.write(sys.stdout.fileno(), bytearray(d))
                     #print("[%02x](%c)" % (d, chr(d)), end='')
                     sys.stdout.flush()
                 else:
