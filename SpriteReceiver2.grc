@@ -457,7 +457,7 @@
     </param>
     <param>
       <key>freq0</key>
-      <value>437.24e6-30e3</value>
+      <value>437.325e6</value>
     </param>
     <param>
       <key>gain_mode0</key>
