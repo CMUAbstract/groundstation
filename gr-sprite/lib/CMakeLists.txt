@@ -23,7 +23,9 @@
 include(GrPlatform) #define LIB_SUFFIX
 
 include_directories(${Boost_INCLUDE_DIR})
-link_directories(${Boost_LIBRARY_DIRS})
+link_directories(${Boost_LIBRARY_DIRS} ${OpenMP_CXX_LIBRARY})
+
+add_compile_options(${OpenMP_CXX_FLAGS})
 
 list(APPEND sprite_sources
     correlator_cf_impl.cc
@@ -32,7 +34,7 @@ list(APPEND sprite_sources
     )
 
 add_library(gnuradio-sprite SHARED ${sprite_sources})
-target_link_libraries(gnuradio-sprite ${Boost_LIBRARIES} ${GNURADIO_RUNTIME_LIBRARIES} ${GNURADIO_ALL_LIBRARIES})
+target_link_libraries(gnuradio-sprite ${Boost_LIBRARIES} ${GNURADIO_RUNTIME_LIBRARIES} ${GNURADIO_ALL_LIBRARIES} ${OpenMP_CXX_LIBRARIES})
 set_target_properties(gnuradio-sprite PROPERTIES DEFINE_SYMBOL "gnuradio_sprite_EXPORTS")
 
 ########################################################################
@@ -62,6 +64,7 @@ target_link_libraries(
   test-sprite
   ${GNURADIO_RUNTIME_LIBRARIES}
   ${Boost_LIBRARIES}
+  ${OpenMP_CXX_LIBRARIES}
   ${CPPUNIT_LIBRARIES}
   gnuradio-sprite
 )

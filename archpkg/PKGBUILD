@@ -1,0 +1,72 @@
+# Maintainer: Alexei Colin <ac@alexeicolin.com>
+
+pkgname=sprite-groundstation
+
+_dir=gr-sprite
+_builddir=${pkgname}-build
+
+pkgver=0
+pkgrel=1
+pkgdesc='GNU Radio-based receiver for KickSat sprites'
+arch=('aarch64' 'x86_64' 'i686')
+url='https://github.com/kicksat/groundstation'
+#license=('custom')
+depends=('gnuradio' 'boost' 'gnuradio-osmosdr' 'swig')
+makedepends=('cmake' 'boost-libs' 'python2-lxml' 'python2-cheetah' 'pygtk')
+source=()
+md5sums=()
+
+
+prepare() {
+    ln -snf "$startdir/.." "$srcdir/$pkgname"
+    mkdir -p ${srcdir}/${_builddir}
+}
+
+pkgver() {
+    cd "${srcdir}/${pkgname}"
+    printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+build() {
+    cd "${srcdir}/$_builddir"
+
+    cmake -Wno-dev -DCMAKE_INSTALL_PREFIX=/usr "${srcdir}/$pkgname/${_dir}"
+    make
+
+    cd ../$pkgname
+    # Build the grc files, need to set path for 'grc' compiler via a config file
+    # NOTE: Yeah, this is very nasty, but grc doesn't support setting the path or cfg file
+    # via CLI arg (or an env var?)
+    _confdir=~/.gnuradio
+    _conffile=config.conf
+    if [ -f $_confdir/$_conffile ]
+    then
+        cp $_confdir/$_conffile{,.pkgbak}
+    fi
+    if [ ! -d $_confdir ]
+    then
+        mkdir $_confdir
+    fi
+    echo -e "[grc]\nlocal_blocks_path=${srcdir}/${pkgname}/${_dir}/grc" > $_confdir/$_conffile
+    make
+    if [ -f $_confdir/$_conffile.pkgbak ]
+    then
+       cp $_confdir/$_conffile{.pkgbak,}
+    else
+       rm $_confdir/$_conffile
+       if ! find $_confdir -mindepth 1 | read
+       then
+           rm -r $_confdir
+       fi
+    fi
+}
+
+package() {
+    cd ${srcdir}/$_builddir
+
+    make DESTDIR="${pkgdir}/" install
+
+    install -Dm0644 $srcdir/${pkgname}/systemd/sprite-rec.service $pkgdir/usr/lib/systemd/system/sprite-rec.service
+    install -Dm0755 $srcdir/${pkgname}/systemd/sprite-rec $pkgdir/usr/bin/sprite-rec
+    install -Dm0755 $srcdir/${pkgname}/systemd/next-file-index $pkgdir/usr/bin/next-file-index
+}

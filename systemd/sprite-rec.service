@@ -1,0 +1,11 @@
+[Unit]
+Description=Record radio data from RTL dongle to file
+
+[Service]
+User=sprite
+Group=sprite
+ExecStart=/usr/bin/sprite-rec /mnt/data/rec/
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

@@ -86,6 +86,10 @@ set(GRC_BLOCKS_DIR      ${GR_PKG_DATA_DIR}/grc/blocks)
 #find_package(GnuradioRuntime)
 set(GR_REQUIRED_COMPONENTS RUNTIME FFT)
 find_package(Gnuradio "3.7.0" REQUIRED)
+find_package(OpenMP REQUIRED)
+if (NOT OpenMP_CXX_FOUND)
+  message(FATAL_ERROR "OpenMP is required to build sprite")
+endif()
 find_package(CppUnit)
 
 # To run a more advanced search for GNU Radio and it's components and
