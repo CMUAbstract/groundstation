@@ -28,6 +28,8 @@
 #define M_SEQUENCE_LENGTH 511
 #define SPRITE_PRN_LENGTH 512
 
+#define NUM_THREADS 4
+
 namespace gr {
   namespace sprite {
 
@@ -49,15 +51,15 @@ namespace gr {
         float m_buffer_real2[SPRITE_PRN_LENGTH];
         float m_buffer_real3[SPRITE_PRN_LENGTH];
           
-        gr_complex* m_fft_buffer_in0;
-        gr_complex* m_fft_buffer_out0;
+        gr_complex* m_fft_buffer_in0[NUM_THREADS];
+        gr_complex* m_fft_buffer_out0[NUM_THREADS];
           
-        fft::fft_complex* m_fft0;
+        fft::fft_complex* m_fft0[NUM_THREADS];
 
-        gr_complex* m_fft_buffer_in1;
-        gr_complex* m_fft_buffer_out1;
+        gr_complex* m_fft_buffer_in1[NUM_THREADS];
+        gr_complex* m_fft_buffer_out1[NUM_THREADS];
           
-        fft::fft_complex* m_fft1;
+        fft::fft_complex* m_fft1[NUM_THREADS];
 
       public:
         correlator_cf_impl(int prn_id0, int prn_id1);

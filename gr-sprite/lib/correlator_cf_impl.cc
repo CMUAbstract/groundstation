@@ -28,6 +28,7 @@
 #include <gnuradio/fft/fft.h>
 #include <complex>
 #include <cmath>
+#include <omp.h>
 
 using namespace std;
 
@@ -61,13 +62,16 @@ namespace gr {
         m_template1[k] = conj(m_template1[k]);
       }
       
-      m_fft0 = new fft::fft_complex(SPRITE_PRN_LENGTH, true, 1);
-      m_fft_buffer_in0 = m_fft0->get_inbuf();
-      m_fft_buffer_out0 = m_fft0->get_outbuf();
+#pragma omp parallel for
+      for (int thid = 0; thid < NUM_THREADS; ++thid) {
+        m_fft0[thid] = new fft::fft_complex(SPRITE_PRN_LENGTH, true, 1);
+        m_fft_buffer_in0[thid] = m_fft0[thid]->get_inbuf();
+        m_fft_buffer_out0[thid] = m_fft0[thid]->get_outbuf();
 
-      m_fft1 = new fft::fft_complex(SPRITE_PRN_LENGTH, true, 1);
-      m_fft_buffer_in1 = m_fft1->get_inbuf();
-      m_fft_buffer_out1 = m_fft1->get_outbuf();
+        m_fft1[thid] = new fft::fft_complex(SPRITE_PRN_LENGTH, true, 1);
+        m_fft_buffer_in1[thid] = m_fft1[thid]->get_inbuf();
+        m_fft_buffer_out1[thid] = m_fft1[thid]->get_outbuf();
+      }
     }
 
     /*
@@ -198,8 +202,10 @@ namespace gr {
         float *out = (float *) output_items[0];
 
         // Do <+signal processing+>
+#pragma omp parallel for num_threads(NUM_THREADS)
         for(int k = 0; k < noutput_items; ++k) {
           
+#if 0
           //Pointwise multiply by baseband template and copy to fft input
           for (int j = 0; j < SPRITE_PRN_LENGTH; ++j)
           {
@@ -210,34 +216,68 @@ namespace gr {
           //Take FFT
           m_fft0->execute();
           m_fft1->execute();
+#else
+          int thid = omp_get_thread_num();
+          fft::fft_complex* fft_plans[2] = { m_fft0[thid], m_fft1[thid] };
+          gr_complex* in_bufs[2] = { m_fft_buffer_in0[thid], m_fft_buffer_in1[thid] };
+          gr_complex* out_bufs[2] = { m_fft_buffer_out0[thid], m_fft_buffer_out1[thid] };
+          gr_complex* templates[2] = { m_template0, m_template1 };
+          float both_maxmag[2];
+
+#pragma omp parallel for num_threads(2)
+          for (int p = 0; p < 2; ++p) {
+            //Pointwise multiply by baseband template and copy to fft input
+            for (int j = 0; j < SPRITE_PRN_LENGTH; ++j)
+            {
+              in_bufs[p][j] = templates[p][j]*in[j+k];
+            }
+            fft_plans[p]->execute();
+
+            float mag = real(out_bufs[p][0]*conj(out_bufs[p][0]));
+            float maxmag = mag;
+            for (int j = 1; j < SPRITE_PRN_LENGTH; ++j)
+            {
+              mag = real(out_bufs[p][j]*conj(out_bufs[p][j]));
+              if (mag > maxmag)
+              {
+                maxmag = mag;
+              }
+            }
+            both_maxmag[p] = maxmag;
+          }
+#endif
           
+#if 0
           //Find largest value in FFT
           float mag0 = real(m_fft_buffer_out0[0]*conj(m_fft_buffer_out0[0]));
           float max0 = mag0;
           float index0 = 0;
           for (int j = 1; j < SPRITE_PRN_LENGTH; ++j)
           {
-            mag0 = real(m_fft_buffer_out0[j]*conj(m_fft_buffer_out0[j]));
+            mag0 = real(out_bufs[0][j]*conj(out_bufs[0][j]));
             if (mag0 > max0)
             {
               max0 = mag0;
               index0 = j;
             }
           }
-          float mag1 = real(m_fft_buffer_out1[0]*conj(m_fft_buffer_out1[0]));
+          float mag1 = real(out_bufs[1][0]*conj(out_bufs[1][0]));
           float max1 = mag1;
           float index1 = 0;
           for (int j = 1; j < SPRITE_PRN_LENGTH; ++j)
           {
-            mag1 = real(m_fft_buffer_out1[j]*conj(m_fft_buffer_out1[j]));
+            mag1 = real(out_bufs[1][j]*conj(out_bufs[1][j]));
             if (mag1 > max1)
             {
               max1 = mag1;
               index1 = j;
             }
           }
-          
           out[k] = max1 >= max0 ? sqrt(max1) : -sqrt(max0);
+#else
+          out[k] = both_maxmag[1] >= both_maxmag[0] ? sqrt(both_maxmag[1]) : -sqrt(both_maxmag[0]);
+#endif
+          
         }
 
         // Tell runtime system how many output items we produced.
