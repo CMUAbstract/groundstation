@@ -123,7 +123,7 @@ namespace gr {
       
       for(int k = 0; k < SPRITE_PRN_LENGTH; k++)
       {
-        baseBand[k] = iBB[k]*cos(M_PI/2*k) + 1i*qBB[k]*sin(M_PI/2*k);
+        baseBand[k] = gr_complex(iBB[k]*cos(M_PI/2*k), qBB[k]*sin(M_PI/2*k));
       }
     }
 
